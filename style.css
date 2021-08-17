@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+html {
+  box-sizing: border-box;
+  font-size: 1em;
+  font-family: 'Roboto', Verdana, sans-serif;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: linear-gradient(to right, white, black);
+}
+
+h1 {
+  font-size: 3em;
+  text-align: center;
+  color: white;
+  text-shadow: 1px 3px 6px black;
+}
+h2 {
+  font-size: 2em;
+  text-align: center;
+  color: black;
+  text-shadow: -1px -1px 3px white;
+}
+
+.text-on-unknown-background {
+  color: white;
+  text-shadow: 0 0 3px black, 0 0 3px black;
+}
+
+input[type="color"] {
+  display: none;
+}
+input[type="text"], input[type="number"] {
+  border-style: solid;
+  border-color: #444;
+  border-width: 4px 0;
+  padding: 2px 0;
+}
+button, .button {
+  margin: 0;
+  padding: 6px;
+  border: none;
+  background: black;
+  color: white;
+  font-weight: bold;
+}
+.button {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+button:disabled {
+  background: #888;
+  color: #ccc;
+}
+.band-color-picker {
+  cursor: pointer;
+}
+.band-color-picker > div {
+  display: inline-block;
+  padding: 6px;
+}
+
+.input-area {
+  background: #fff;
+  border: 8px solid #fff;
+}
+.input-area-2 {
+  padding: 0 8px;
+  text-shadow: 0 0 2px white;
+}
+.band-input-area {
+  background: #fff;
+  border: 8px dashed #000;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.number-input-size-1 {
+  width: 3em;
+  text-align: center;
+}
+.number-input-size-2 {
+  width: 5em;
+  text-align: center;
+}
+.input-size-5 {
+  width: 60em;
+}
+.input-filename {
+  text-align: right;
+}
+
+svg {
+  max-width: 100%;
+  display: block;
+  margin: 30px auto;
+  box-shadow: 25px 15px 35px black, -25px -15px 35px white;
+}
