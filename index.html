@@ -1,1 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="https://cdn.glitch.com/ea9f1dc6-ee18-4a48-834e-10d07b3d441f%2Fflagthing-icon.svg?v=1629169608601">
+    <title>flagthing</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://unpkg.com/vue@next" defer></script>
+    <script src="/script.js" defer></script>
 
+  </head>
+  <body>
+    
+    <section id="flag-maker">
+      
+      
+      <h1>fl<span v-for="band in bands" :style="`text-shadow: 1px 3px 6px white, -1px -3px 6px black;color: ${colors[band]};`">a</span>gthing</h1>
+
+      <h2>Define the basic configuration</h2>
+      
+      <template v-if="showSection[0]">
+        <button @click="showSection[0] = false">
+          hide
+        </button>
+        <div class="input-area">
+          <button @click="verticalBands = !verticalBands">make bands {{ verticalBands? "horizontal" : "vertical" }}</button>.
+          Aspect ratio: <input v-model="heightFactor" type="number" class="number-input-size-1">:<input v-model="widthFactor" type="number" class="number-input-size-1">.
+          Multiplied by <input v-model="sizeFactor" type="number" class="number-input-size-2"> pixels, it produces a {{ width }}×{{ height }}px image.
+          <span v-if="widthFactor/heightFactor !== 5/3">The most common ratio is <button @click="restoreRatio">3:5</button></span>
+        </div>
+      </template>
+      <div v-else>
+        <button @click="showSection[0] = true">
+          show
+        </button>
+      </div>
+
+      
+      <h2>Pick the colors</h2>
+      
+      <template v-if="showSection[1]">
+        <button @click="showSection[1] = false">
+          hide
+        </button>
+        <div>
+          <button @click="createColor">create new color</button>
+          <div v-for="(color, index) in colors" class="band-input-area" :style="`border: 8px solid ${color};background: ${color};`">
+            <span class="text-on-unknown-background">{{ index }}</span>
+            <input v-model="colors[index]" type="text">
+            <label class="button">picker<input v-model="colors[index]" type="color"></label>
+            <button @click="deleteColor(index)">delete</button>
+          </div>
+        </div>
+      </template>
+      <div v-else>
+        <button @click="showSection[1] = true">
+          show
+        </button>
+      </div>
+      
+      
+      <h2>Arrange the bands</h2>
+
+      <template v-if="showSection[2]">
+        <button @click="showSection[2] = false">
+          hide
+        </button>
+        <div class="input-area-2">
+          You can
+          <button @click="createBand">create new band</button>,
+          <button @click="deleteAll" :disabled="bands.length === 0">delete all</button>,
+          <button @click="flip" :disabled="isSymmetrical">flip</button>,
+          <button @click="mirrorUp" :disabled="bands.length === 0">mirror ▲</button>,
+          <button @click="mirrorDown" :disabled="bands.length === 0">mirror ▼</button>,
+          <button @click="rotateUp" :disabled="isOneColor">rotate ▲</button>,
+          <button @click="rotateDown" :disabled="isOneColor">rotate ▼</button>,
+          <button @click="undo" :disabled="actions.length === 0">undo</button> or
+          <button @click="redo" :disabled="undoneActions.length === 0">redo</button>.
+        </div>
+
+        <div>
+          <div v-for="(band, i) in bands" class="band-input-area" :style="`border: 8px solid ${colors[band]};background: ${colors[band]};`">
+            <!--select :v-model="bands[i]" @change="bands[i]=$event.target.value">
+              <option v-for="(color, ci) in colors" :value="ci">{{ `${ci}: ${color}` }}</option>
+            </select-->
+            <div class="band-color-picker text-on-unknown-background">
+              <div v-for="(color, ci) of colors"
+                   :value="ci"
+                   :style="`background: ${color}`"
+                   @click="colorBand(i, ci)">
+                {{ ci }}
+              </div>
+            </div>
+            <button @click="moveBandUp(i)" :disabled="i == 0">▲</button>
+            <button @click="moveBandDown(i)" :disabled="i == bands.length - 1">▼</button>
+            <button @click="duplicateBand(i)">clone</button>
+            <button @click="deleteBand(i)">delete</click>
+          </div>
+        </div>
+        
+      </template>
+      <div v-else>
+        <button @click="showSection[2] = true">
+          show
+        </button>
+      </div>
+      
+      
+      <h2>
+        Check the results
+      </h2>
+
+      <div id="svg-flag-container">
+        <svg v-if="!verticalBands"
+          :width="width"
+          :height="height"
+          :view-box.camel="`0 0 ${ widthFactor * bands.length } ${ heightFactor * bands.length }`"
+          xmlns="http://www.w3.org/2000/svg">
+          <rect v-for="(band, index) in bands"
+            x="0"
+            :y="index * heightFactor"
+            :width="widthFactor * bands.length"
+            :height="heightFactor"
+            :fill="colors[band]">
+          </rect>
+        </svg>
+        <svg v-else
+          :width="width"
+          :height="height"
+          :view-box.camel="`0 0 ${ widthFactor * bands.length } ${ heightFactor * bands.length }`"
+          xmlns="http://www.w3.org/2000/svg">
+          <rect v-for="(band, index) in bands"
+            :x="index * widthFactor"
+            y="0"
+            :width="widthFactor"
+            :height="heightFactor * bands.length"
+            :fill="colors[band]">
+          </rect>
+        </svg>
+      </div>
+      
+      
+      <h2>Save them</h2>
+
+      <div class="input-area">
+        <button @click="copyUrl">copy</button>
+        <input :value="url" type="text" class="input-size-5">
+      </div>
+      <div class="input-area">
+        <button @click="download">download</button>
+        <input v-model="fileNameInput" type="text" :placeholder="fileNameDefault" class="input-filename">.svg
+      </div>
+
+    </section>
+  </body>
+</html>
